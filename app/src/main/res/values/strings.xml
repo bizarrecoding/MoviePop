@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MoviePop</string>
+    <string name="sortpopularity">Sort by popularity</string>
+    <string name="sortrating">Sort by rating</string>
+    <string name="no_overview">No overview found.</string>
+    <string name="no_release">No release date avaliable</string>
+    <string name="networkerror">No internet connection</string>
+    <string name="task_error">Error while downloading movies</string>
+</resources>
