@@ -28,7 +28,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         TextView orgtitle = (TextView) findViewById(R.id.originalTitle);
         TextView overview = (TextView) findViewById(R.id.overview);
         TextView release = (TextView) findViewById(R.id.release);
+        TextView numRate = (TextView) findViewById(R.id.numRate);
         RatingBar ratebar = (RatingBar) findViewById(R.id.ratingBar);
+
         if(movie.getImagePath().length()<40 ){
             String placeholder ="http://via.placeholder.com/100x150";
             Picasso.with(this).load(placeholder).into(cover);
@@ -37,19 +39,24 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
         title.setText(movie.getTitle());
         orgtitle.setText(movie.getOriginalTitle());
-        String overviewStr = movie.getOverview();
-        if(overviewStr.length()>0){
-            overview.setText(movie.getOverview());
-        }else{
-            overview.setText(R.string.no_overview);
-        }
         String releaseStr = movie.getOverview();
         if(releaseStr.length()>0){
             release.setText(movie.getReleaseDate());
         }else{
             release.setText(R.string.no_release);
         }
-        ratebar.setMax(10);
-        ratebar.setRating((float) movie.getVotesavg());
+        float rate = (float) movie.getVotesavg();
+        numRate.setText("("+rate+")");
+        ratebar.setNumStars(5);
+        ratebar.setStepSize(0.5f);
+        ratebar.setRating(rate/2);
+        ratebar.invalidate();
+
+        String overviewStr = movie.getOverview();
+        if(overviewStr.length()>0){
+            overview.setText(movie.getOverview());
+        }else{
+            overview.setText(R.string.no_overview);
+        }
     }
 }

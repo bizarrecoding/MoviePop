@@ -9,4 +9,5 @@
     <string name="task_error">Error while downloading movies</string>
     <string name="original_title">Original title:</string>
     <string name="release_date">Release date:</string>
+    <string name="overview">Overview</string>
 </resources>

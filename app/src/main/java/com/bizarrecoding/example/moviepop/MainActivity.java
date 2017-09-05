@@ -166,16 +166,13 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i<results.length(); i++){
                     JSONObject movieObj  = results.getJSONObject(i);
                     int id = movieObj.getInt("id");
-                    int count = movieObj.getInt("vote_count");
                     double avg = movieObj.getDouble("vote_average");
-                    double popularity = movieObj.getDouble("popularity");
                     String title = movieObj.getString("title");
                     String orgTitle = movieObj.getString("original_title");
-                    String orgLang = movieObj.getString("original_language");
                     String release = movieObj.getString("release_date");
                     String overview = movieObj.getString("overview");
                     String imageCover = movieObj.getString("poster_path");
-                    Movie movie = new Movie(id,count,avg,popularity,title,orgTitle,orgLang,release,overview,imageCover);
+                    Movie movie = new Movie(id, avg, title, orgTitle, release, overview, imageCover);
                     movies.add(movie);
                 }
                 Log.d("asynctask",json);

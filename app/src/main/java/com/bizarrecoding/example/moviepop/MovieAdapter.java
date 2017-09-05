@@ -33,8 +33,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
         final Context cxt = parent.getContext();
         LayoutInflater linf = LayoutInflater.from(cxt);
         View view = linf.inflate(R.layout.grid_movie_entry, parent, false);
-        ViewHolder vHolder = new ViewHolder(view);
-        return vHolder;
+        return new ViewHolder(view);
     }
 
     @Override
