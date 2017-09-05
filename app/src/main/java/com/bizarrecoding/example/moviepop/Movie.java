@@ -1,15 +1,8 @@
 package com.bizarrecoding.example.moviepop;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.io.Serializable;
 
-/**
- * Created by Herik on 3/9/2017.
- */
-
-public class Movie implements Serializable {
+class Movie implements Serializable {
 
     private int id;
     private int voteCount;
@@ -21,8 +14,6 @@ public class Movie implements Serializable {
     private String releaseDate;
     private String overview;
     private String imagePath;
-
-    private final String BASE_IMG_PATH = "https://image.tmdb.org/t/p/";
 
     public int getId() {
         return id;
@@ -75,10 +66,11 @@ public class Movie implements Serializable {
         this.originalLang = originalLang;
         this.overview = overview;
         this.releaseDate = releaseDate;
-        if (imagePath.equals("")){
+        if (imagePath.equals("") || imagePath.equals("null")){
             this.imagePath="";
         }else {
-            this.imagePath = BASE_IMG_PATH+"w185"+imagePath;
+            String BASE_IMG_PATH = "https://image.tmdb.org/t/p/";
+            this.imagePath = BASE_IMG_PATH +"w185"+imagePath;
         }
     }
 }

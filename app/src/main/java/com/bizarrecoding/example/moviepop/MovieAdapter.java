@@ -13,10 +13,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-/**
- * Created by Herik on 3/9/2017.
- */
-
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
 
     private ArrayList<Movie> movies;
@@ -36,7 +32,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final Context cxt = parent.getContext();
         LayoutInflater linf = LayoutInflater.from(cxt);
-        View view = linf.inflate(R.layout.custom_movie_entry, parent, false);
+        View view = linf.inflate(R.layout.grid_movie_entry, parent, false);
         ViewHolder vHolder = new ViewHolder(view);
         return vHolder;
     }
@@ -47,8 +43,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
         holder.title.setText(m.getTitle());
         holder.rating.setText(m.getVotesavg()+"");
         holder.release.setText(m.getReleaseDate());
+
         String path = m.getImagePath();
-        Picasso.with(ctx).load(path).into(holder.cover);
+        if(path.length()<40 ){
+            String placeholder ="http://via.placeholder.com/100x150";
+            Picasso.with(ctx).load(placeholder).into(holder.cover);
+        }else {
+            Picasso.with(ctx).load(path).into(holder.cover);
+        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,7 +60,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
             }
         });
     }
-    public Context getContext(){
+    private Context getContext(){
         return ctx;
     }
 
@@ -67,7 +69,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
         return movies.size();
     }
 
-    protected class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView cover;
         private TextView title;
         private TextView rating;

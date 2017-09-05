@@ -29,8 +29,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         TextView overview = (TextView) findViewById(R.id.overview);
         TextView release = (TextView) findViewById(R.id.release);
         RatingBar ratebar = (RatingBar) findViewById(R.id.ratingBar);
-
-        if(movie.getImagePath().length()>30 ){
+        if(movie.getImagePath().length()<40 ){
             String placeholder ="http://via.placeholder.com/100x150";
             Picasso.with(this).load(placeholder).into(cover);
         }else {

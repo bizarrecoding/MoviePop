@@ -1,18 +1,12 @@
 package com.bizarrecoding.example.moviepop.Utils;
 
 import android.net.Uri;
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
-
-/**
- * Created by Herik on 3/9/2017.
- */
 
 public class Network {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
@@ -37,9 +31,7 @@ public class Network {
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
-
         }
-        Log.d("URL",url.toString());
         return url;
     }
 

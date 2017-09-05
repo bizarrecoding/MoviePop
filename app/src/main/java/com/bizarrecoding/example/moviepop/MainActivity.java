@@ -1,10 +1,11 @@
 package com.bizarrecoding.example.moviepop;
 
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected int currentPage = 1;
     private ProgressBar progress;
     private TextView errorTV;
+    private GridLayoutManager glManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +48,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initGUI() {
+        //Init UI components
         getWindow().setBackgroundDrawable(null);
         sortType = (TextView)findViewById(R.id.sort);
-        movies = new ArrayList<>();
-        movieListHolder = (RecyclerView) findViewById(R.id.movieList);
         progress = (ProgressBar) findViewById(R.id.progressBar);
         errorTV = (TextView)findViewById(R.id.errorTV);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        movieListHolder.setLayoutManager(layoutManager);
+        movieListHolder = (RecyclerView) findViewById(R.id.movieList);
+
+        movies = new ArrayList<>();
+
+        //LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        glManager = new GridLayoutManager(this,2);
+        movieListHolder.setLayoutManager(glManager);
+        movieListHolder.setHasFixedSize(true);
         mAdapter = new MovieAdapter(this, movies);
         movieListHolder.setAdapter(mAdapter);
 
@@ -64,6 +71,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ){
+            glManager.setSpanCount(3);
+        }else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            glManager.setSpanCount(2);
+        }
+        movieListHolder.setLayoutManager(glManager);
+        movieListHolder.invalidate();
+    }
+
+
     private void showError(int errorRes) {
         movieListHolder.setVisibility(View.INVISIBLE);
         progress.setVisibility(View.INVISIBLE);
@@ -71,20 +91,20 @@ public class MainActivity extends AppCompatActivity {
         errorTV.setText(errorRes);
     }
 
-    public void showMovies(){
+    private void showMovies(){
         movieListHolder.setVisibility(View.VISIBLE);
         progress.setVisibility(View.INVISIBLE);
         errorTV.setVisibility(View.INVISIBLE);
     }
 
-    public void showProgress(){
+    private void showProgress(){
         movieListHolder.setVisibility(View.INVISIBLE);
         progress.setVisibility(View.VISIBLE);
         errorTV.setVisibility(View.INVISIBLE);
     }
 
 
-    public boolean isOnline() {
+    private boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(MainActivity.CONNECTIVITY_SERVICE);
 
@@ -127,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class moviesTask extends AsyncTask<URL, Void, String>{
+    private class moviesTask extends AsyncTask<URL, Void, String>{
 
         @Override
         protected void onPreExecute() {
