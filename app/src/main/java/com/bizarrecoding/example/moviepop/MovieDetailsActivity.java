@@ -33,9 +33,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         if(movie.getImagePath().length()<40 ){
             String placeholder ="http://via.placeholder.com/100x150";
-            Picasso.with(this).load(placeholder).into(cover);
+            Picasso.with(this)
+                    .load(placeholder)
+                    .into(cover);
         }else {
-            Picasso.with(this).load(movie.getImagePath()).into(cover);
+            Picasso.with(this)
+                    .load(movie.getImagePath())
+                    .into(cover);
         }
         title.setText(movie.getTitle());
         orgtitle.setText(movie.getOriginalTitle());

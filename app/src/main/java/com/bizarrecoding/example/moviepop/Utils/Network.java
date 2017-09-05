@@ -1,6 +1,9 @@
 package com.bizarrecoding.example.moviepop.Utils;
 
 import android.net.Uri;
+
+import com.bizarrecoding.example.moviepop.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -9,21 +12,25 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class Network {
-    private static final String BASE_URL = "https://api.themoviedb.org/3/";
-    private static final String DISCOVER = "discover/movie";
-    private static final String SORT_PARAM = "sort_by";
+    private static final String TOPRATED = "http://api.themoviedb.org/3/movie/top_rated";
+    private static final String POPULAR = "http://api.themoviedb.org/3/movie/popular";
     private static final String KEY_PARAM = "api_key";
     private static final String PAGE_PARAM = "page";
 
-    private static final String KEY = "da96d73bfe83cdc4d3787ed3f60dd830";
-    private static final String[] sorts = {"popularity.desc","vote_average.desc"};
+    private static final String API_KEY = BuildConfig.API_KEY;
 
 
     public static URL buildURL(int sort, int page){
-        Uri builtUri = Uri.parse(BASE_URL+DISCOVER).buildUpon()
-                .appendQueryParameter(SORT_PARAM, sorts[sort])
+        String base;
+        if(sort==0){
+            base = POPULAR;
+        }else{
+            base = TOPRATED;
+        }
+
+        Uri builtUri = Uri.parse(base).buildUpon()
                 .appendQueryParameter(PAGE_PARAM, page+"")
-                .appendQueryParameter(KEY_PARAM, KEY)
+                .appendQueryParameter(KEY_PARAM, API_KEY)
                 .build();
         URL url = null;
         try {

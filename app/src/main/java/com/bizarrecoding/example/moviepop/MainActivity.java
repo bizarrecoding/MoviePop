@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,18 +58,23 @@ public class MainActivity extends AppCompatActivity {
 
         movies = new ArrayList<>();
 
-        //LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        glManager = new GridLayoutManager(this,2);
+        glManager = new GridLayoutManager(this,numberOfColumns());
         movieListHolder.setLayoutManager(glManager);
         movieListHolder.setHasFixedSize(true);
         mAdapter = new MovieAdapter(this, movies);
         movieListHolder.setAdapter(mAdapter);
 
-        if(isOnline()){
-            loadMovies();
-        }else{
-            showError(R.string.networkerror);
-        }
+        loadMovies();
+    }
+    private int numberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        // You can change this divider to adjust the size of the poster
+        int widthDivider = 400;
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if (nColumns < 2) return 2;
+        return nColumns;
     }
 
     @Override
@@ -113,8 +119,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadMovies() {
-        URL query = Network.buildURL(currentSort,currentPage);
-        new moviesTask().execute(query);
+        if(isOnline()){
+            URL query = Network.buildURL(currentSort,currentPage);
+            new moviesTask().execute(query);
+        }else{
+            showError(R.string.networkerror);
+        }
     }
 
     @Override
