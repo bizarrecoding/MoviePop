@@ -15,9 +15,7 @@ public class Network {
     private static final String KEY_PARAM = "api_key";
     private static final String PAGE_PARAM = "page";
 
-
-
-    private static final String KEY = "da96d73bfe83cdc4d3787ed3f60dd830";
+    private static final String KEY = "";
     private static final String[] sorts = {"popularity.desc","vote_average.desc"};
 
 
