@@ -1,5 +1,6 @@
-package com.bizarrecoding.example.moviepop;
+package com.bizarrecoding.example.moviepop.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -9,23 +10,41 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bizarrecoding.example.moviepop.Objects.Movie;
+import com.bizarrecoding.example.moviepop.MovieDetailsActivity;
+import com.bizarrecoding.example.moviepop.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
 
-    private ArrayList<Movie> movies;
+    public static final int MOVIE_REQUEST_CODE = 111;
+    private List<Movie> movies;
     private Context ctx;
 
-    public MovieAdapter(Context ctx, ArrayList<Movie> mList){
+    public MovieAdapter(Context ctx, List<Movie> mList){
         this.movies = mList;
         this.ctx = ctx;
     }
 
-    public void setMovies(ArrayList<Movie> mList){
-        this.movies = mList;
+    public void setMovies(boolean firstTime, List<Movie> mList){
+        if (firstTime) {
+            this.movies = mList;
+        }else {
+            this.movies.addAll(mList);
+        }
         notifyDataSetChanged();
+    }
+
+    private Context getContext(){
+        return ctx;
+    }
+
+    @Override
+    public int getItemCount() {
+        return movies.size();
     }
 
     @Override
@@ -55,17 +74,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
             public void onClick(View v) {
                 Intent in = new Intent(getContext(),MovieDetailsActivity.class);
                 in.putExtra("movie", m);
-                getContext().startActivity(in);
+                ((Activity)ctx).startActivityForResult(in, MOVIE_REQUEST_CODE);
             }
         });
-    }
-    private Context getContext(){
-        return ctx;
-    }
-
-    @Override
-    public int getItemCount() {
-        return movies.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

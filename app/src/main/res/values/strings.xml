@@ -10,4 +10,10 @@
     <string name="original_title">Original title:</string>
     <string name="release_date">Release date:</string>
     <string name="overview">Overview</string>
+    <string name="favorites">Favorites</string>
+    <string name="settings">Settings</string>
+    <string name="movies">com.example.moviepop.movies</string>
+    <string name="extras">com.example.moviepop.extras</string>
+    <string name="add_favorite">Favorite added</string>
+    <string name="delete_favorite">Favorite deleted</string>
 </resources>

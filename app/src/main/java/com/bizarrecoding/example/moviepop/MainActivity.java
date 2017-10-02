@@ -1,9 +1,13 @@
 package com.bizarrecoding.example.moviepop;
 
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,64 +16,92 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bizarrecoding.example.moviepop.Adapters.MovieAdapter;
+import com.bizarrecoding.example.moviepop.Objects.Movie;
+import com.bizarrecoding.example.moviepop.Utils.ApiMovieFetchLoader;
+import com.bizarrecoding.example.moviepop.Utils.GlobalFunctions;
 import com.bizarrecoding.example.moviepop.Utils.Network;
+import com.bizarrecoding.example.moviepop.localData.DBLoader;
+import com.github.pwittchen.infinitescroll.library.InfiniteScrollListener;
 
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import static com.bizarrecoding.example.moviepop.Adapters.MovieAdapter.MOVIE_REQUEST_CODE;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks{ //<List<Object>>{
+
+    private static final int MOVIELOADERID = 100;
+    public static final int FAVORITES = 2;
+    public static final int RATING = 1;
+    public static final int POPULARITY = 0;
+    private static final int FAVSLOADERID = 200;
+    private static final int MAXITEMSPERREQUEST = 20;
+    private int currentSort = 0;
+    protected int currentPage = 1;
+    private int page = 1;
+    private boolean firstTime = true;
 
     private RecyclerView movieListHolder;
     private TextView sortType;
-    private ArrayList<Movie> movies;
+    private List<Movie> movies;
     private MovieAdapter mAdapter;
-    private int currentSort = 0;
-    protected int currentPage = 1;
     private ProgressBar progress;
     private TextView errorTV;
+    private Parcelable state;
     private GridLayoutManager glManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState!=null) {
+            currentSort = savedInstanceState.getInt("sort");
+            if(savedInstanceState.containsKey("page")){
+                currentPage = savedInstanceState.getInt("page");
+            }
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initGUI();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("sort",currentSort);
+        if(firstTime) {
+            outState.putInt("page", currentPage);
+        }
+    }
+
     private void initGUI() {
         //Init UI components
-        getWindow().setBackgroundDrawable(null);
-        sortType = (TextView)findViewById(R.id.sort);
+        sortType = (TextView) findViewById(R.id.sort);
         progress = (ProgressBar) findViewById(R.id.progressBar);
-        errorTV = (TextView)findViewById(R.id.errorTV);
+        errorTV = (TextView) findViewById(R.id.errorTV);
         movieListHolder = (RecyclerView) findViewById(R.id.movieList);
-
         movies = new ArrayList<>();
 
-        glManager = new GridLayoutManager(this,numberOfColumns());
+        glManager = new GridLayoutManager(this, numberOfColumns());
         movieListHolder.setLayoutManager(glManager);
         movieListHolder.setHasFixedSize(true);
         mAdapter = new MovieAdapter(this, movies);
         movieListHolder.setAdapter(mAdapter);
-
-        loadMovies();
+        movieListHolder.addOnScrollListener(createInfiniteScrollListener());
+        if (currentSort == FAVORITES){
+            loadFavs();
+        }else{
+            loadMovies();
+        }
     }
+
     private int numberOfColumns() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        // You can change this divider to adjust the size of the poster
         int widthDivider = 400;
         int width = displayMetrics.widthPixels;
         int nColumns = width / widthDivider;
@@ -80,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if(state!=null && movieListHolder != null) {
+            movieListHolder.getLayoutManager().onRestoreInstanceState(state);
+        }
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ){
             glManager.setSpanCount(3);
         }else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -88,27 +123,6 @@ public class MainActivity extends AppCompatActivity {
         movieListHolder.setLayoutManager(glManager);
         movieListHolder.invalidate();
     }
-
-
-    private void showError(int errorRes) {
-        movieListHolder.setVisibility(View.INVISIBLE);
-        progress.setVisibility(View.INVISIBLE);
-        errorTV.setVisibility(View.VISIBLE);
-        errorTV.setText(errorRes);
-    }
-
-    private void showMovies(){
-        movieListHolder.setVisibility(View.VISIBLE);
-        progress.setVisibility(View.INVISIBLE);
-        errorTV.setVisibility(View.INVISIBLE);
-    }
-
-    private void showProgress(){
-        movieListHolder.setVisibility(View.INVISIBLE);
-        progress.setVisibility(View.VISIBLE);
-        errorTV.setVisibility(View.INVISIBLE);
-    }
-
 
     private boolean isOnline() {
         ConnectivityManager cm =
@@ -120,12 +134,72 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadMovies() {
         if(isOnline()){
-            URL query = Network.buildURL(currentSort,currentPage);
-            new moviesTask().execute(query);
+            LoaderManager lm = getSupportLoaderManager();
+            Loader movieLoader = lm.getLoader(MOVIELOADERID);
+            Bundle b = new Bundle();
+            b.putString("Action",getResources().getString(R.string.movies));
+            String[] urls = new String[]{Network.buildURL(currentSort,currentPage).toString()};
+            b.putStringArray("urls",urls);
+            if (movieLoader == null) {
+                lm.initLoader(MOVIELOADERID, b, this);
+            }else{
+                lm.restartLoader(MOVIELOADERID, b, this);
+            }
         }else{
-            showError(R.string.networkerror);
+            GlobalFunctions.showError(R.string.networkerror,progress,movieListHolder,errorTV);
         }
     }
+
+
+    @Override
+    public Loader onCreateLoader(int id, Bundle args) {
+        if (firstTime)
+            GlobalFunctions.showProgress(true,progress,movieListHolder,errorTV);
+        if(id == MOVIELOADERID){
+            Log.d("Loader"+id+" query",""+args.getStringArray("urls")[0].toString());
+            return new ApiMovieFetchLoader(this,args);
+        }else if( id == FAVSLOADERID){
+            Log.d("Loader"+id+" query",""+args.getInt("Action"));
+            return new DBLoader(this,args);
+        }else{
+            GlobalFunctions.showError(R.string.task_error,progress,movieListHolder,errorTV);
+            return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object data) {
+        if (data==null) {
+            GlobalFunctions.showError(R.string.task_error,progress,movieListHolder,errorTV);
+        }else{
+            switch (loader.getId()){
+                case MOVIELOADERID:
+                    Log.d("Loader"+loader.getId()+" data size",data.toString());
+                    mAdapter.setMovies(
+                            firstTime,
+                            ((List<List<Movie>>) data).get(0)
+                    );
+                    if(firstTime)
+                        GlobalFunctions.showProgress(false,progress,movieListHolder,errorTV);
+                    break;
+                case FAVSLOADERID:
+                    Log.d("Loader"+loader.getId()+" Cursor count",""+((Cursor) data).getCount());
+                    ArrayList<Movie> favorites = new ArrayList<>();
+                    Cursor favsCursor = (Cursor)  data;
+                    while (favsCursor.moveToNext()){
+                        Movie m = new Movie(favsCursor);
+                        favorites.add(m);
+                    }
+                    favsCursor.close();
+                    mAdapter.setMovies(firstTime,favorites);
+                    GlobalFunctions.showProgress(false,progress,movieListHolder,errorTV);
+                    break;
+            }
+        }
+    }
+    @Override
+    public void onLoaderReset(Loader loader) {}
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -133,74 +207,80 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        //Log.d("","");
         switch(id) {
             case R.id.spopularity:
-                if(currentSort==1){
+                if(currentSort!=POPULARITY){
                     sortType.setText(R.string.sortpopularity);
-                    currentSort = 0;
+                    currentSort = POPULARITY;
+                    currentPage = 1;
+                    firstTime = true;
                     loadMovies();
                 }
                 break;
             case R.id.srating:
-                if(currentSort==0){
+                if(currentSort!= RATING){
                     sortType.setText(R.string.sortrating);
-                    currentSort = 1;
+                    currentSort = RATING;
+                    currentPage = 1;
+                    firstTime = true;
                     loadMovies();
                 }
+                break;
+            case R.id.sfavorites:
+                currentSort = FAVORITES;
+                sortType.setText(R.string.favorites);
+                loadFavs();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private class moviesTask extends AsyncTask<URL, Void, String>{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            movies.clear();
-            showProgress();
-        }
-
-        @Override
-        protected String doInBackground(URL... params) {
-            try {
-                String json = Network.getResponseFromHttpUrl(params[0]);
-                Log.d("JSON",json);
-                JSONObject list = new JSONObject(json);
-                JSONArray results = list.getJSONArray("results");
-                for (int i = 0; i<results.length(); i++){
-                    JSONObject movieObj  = results.getJSONObject(i);
-                    int id = movieObj.getInt("id");
-                    double avg = movieObj.getDouble("vote_average");
-                    String title = movieObj.getString("title");
-                    String orgTitle = movieObj.getString("original_title");
-                    String release = movieObj.getString("release_date");
-                    String overview = movieObj.getString("overview");
-                    String imageCover = movieObj.getString("poster_path");
-                    Movie movie = new Movie(id, avg, title, orgTitle, release, overview, imageCover);
-                    movies.add(movie);
-                }
-                Log.d("asynctask",json);
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-                showError(R.string.task_error);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            mAdapter.setMovies(movies);
-            Log.d("ARRAY",""+movies.size());
-            showMovies();
+    private void loadFavs() {
+        LoaderManager lm = getSupportLoaderManager();
+        Loader favsLoader = lm.getLoader(FAVSLOADERID);
+        if (favsLoader == null) {
+            Bundle b = new Bundle();
+            b.putInt("Action",FAVSLOADERID);
+            lm.initLoader(FAVSLOADERID, b, this);
+        }else{
+            Bundle b = new Bundle();
+            b.putInt("Action",FAVSLOADERID);
+            lm.restartLoader(FAVSLOADERID, b, this);
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if( currentSort == FAVORITES && requestCode == MOVIE_REQUEST_CODE && resultCode == RESULT_OK){
+            if(data.getBooleanExtra("change",true)){
+                loadFavs();
+            }
+        }
+    }
 
+    private InfiniteScrollListener createInfiniteScrollListener() {
+        return new InfiniteScrollListener(MAXITEMSPERREQUEST, glManager) {
+            @Override public void onScrolledToEnd(final int firstVisibleItemPosition) {
+                Log.d("INFINITE scroll", "firstTime: "+firstTime+"\npage: "+currentPage +" > "+Math.ceil((float) mAdapter.getItemCount() / (float) MAXITEMSPERREQUEST));
+
+                if (!firstTime && currentPage > Math.ceil((float) mAdapter.getItemCount() / (float) MAXITEMSPERREQUEST)) {
+                    Log.d("INFINITE scroll", "onScrolledToEnd: break");
+                    return;
+                }
+                /*
+                    MuverRestClient.addHeader("token", new CurrentUser(RideRecordsActivity.this).getToken());
+                    RequestParams params = new RequestParams();
+                    params.put("page", page);
+                    params.put("per_page", MAXITEMSPERREQUEST);
+                */
+                currentPage++;
+                firstTime = false;
+                loadMovies();
+            }
+        };
+    }
 }

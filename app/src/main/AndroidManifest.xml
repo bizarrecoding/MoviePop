@@ -24,6 +24,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".MovieDetailsActivity"/>
+
+        <provider
+            android:name="com.bizarrecoding.example.moviepop.localData.MovieProvider"
+            android:authorities="com.bizarrecoding.example.moviepop"
+            android:exported="false"/>
     </application>
 
 </manifest>
