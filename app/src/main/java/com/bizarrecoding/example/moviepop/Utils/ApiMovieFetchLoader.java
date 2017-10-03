@@ -3,7 +3,6 @@ package com.bizarrecoding.example.moviepop.Utils;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import android.content.Context;
-import android.util.Log;
 
 import com.bizarrecoding.example.moviepop.Objects.Movie;
 import com.bizarrecoding.example.moviepop.Objects.Review;
@@ -34,7 +33,6 @@ public class ApiMovieFetchLoader extends AsyncTaskLoader<List<Object>> {
     public ApiMovieFetchLoader(Context context, Bundle args){
         super(context);
         this.ctx = context;
-        Log.d("LOADERBUNDLE",args.toString());
         this.urls = args.getStringArray("urls");
         this.action = args.getString("Action");
         this.MovieAction = getContext().getResources().getString(R.string.movies);
@@ -46,7 +44,6 @@ public class ApiMovieFetchLoader extends AsyncTaskLoader<List<Object>> {
         if(objects==null){
             forceLoad();
         }else {
-            Log.d("LOADER"+getId(),"objects not empty");
             deliverResult(objects);
         }
     }
@@ -64,7 +61,6 @@ public class ApiMovieFetchLoader extends AsyncTaskLoader<List<Object>> {
             for (int i = 0;i<urls.length;i++) {
                 URL url = new URL(urls[i]);
                 String json = Network.getResponseFromHttpUrl(url);
-                Log.d("Loader"+getId()+" JSON", json);
                 JSONObject list = new JSONObject(json);
                 JSONArray results = list.getJSONArray("results");
                 objList.add(parseJSON(results,i));

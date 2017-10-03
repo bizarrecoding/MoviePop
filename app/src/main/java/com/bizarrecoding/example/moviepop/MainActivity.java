@@ -13,7 +13,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
@@ -35,14 +34,13 @@ import static com.bizarrecoding.example.moviepop.Adapters.MovieAdapter.MOVIE_REQ
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks{ //<List<Object>>{
 
     private static final int MOVIELOADERID = 100;
-    public static final int FAVORITES = 2;
-    public static final int RATING = 1;
-    public static final int POPULARITY = 0;
     private static final int FAVSLOADERID = 200;
-    private static final int MAXITEMSPERREQUEST = 20;
+    public static final int POPULARITY = 0;
+    public static final int RATING = 1;
+    public static final int FAVORITES = 2;
     private int currentSort = 0;
-    protected int currentPage = 1;
-    private int page = 1;
+    private static final int MAXITEMSPERREQUEST = 20;
+    private int currentPage = 1;
     private boolean firstTime = true;
 
     private RecyclerView movieListHolder;
@@ -156,10 +154,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (firstTime)
             GlobalFunctions.showProgress(true,progress,movieListHolder,errorTV);
         if(id == MOVIELOADERID){
-            Log.d("Loader"+id+" query",""+args.getStringArray("urls")[0].toString());
             return new ApiMovieFetchLoader(this,args);
         }else if( id == FAVSLOADERID){
-            Log.d("Loader"+id+" query",""+args.getInt("Action"));
             return new DBLoader(this,args);
         }else{
             GlobalFunctions.showError(R.string.task_error,progress,movieListHolder,errorTV);
@@ -174,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }else{
             switch (loader.getId()){
                 case MOVIELOADERID:
-                    Log.d("Loader"+loader.getId()+" data size",data.toString());
                     mAdapter.setMovies(
                             firstTime,
                             ((List<List<Movie>>) data).get(0)
@@ -183,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         GlobalFunctions.showProgress(false,progress,movieListHolder,errorTV);
                     break;
                 case FAVSLOADERID:
-                    Log.d("Loader"+loader.getId()+" Cursor count",""+((Cursor) data).getCount());
                     ArrayList<Movie> favorites = new ArrayList<>();
                     Cursor favsCursor = (Cursor)  data;
                     while (favsCursor.moveToNext()){
@@ -265,18 +259,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private InfiniteScrollListener createInfiniteScrollListener() {
         return new InfiniteScrollListener(MAXITEMSPERREQUEST, glManager) {
             @Override public void onScrolledToEnd(final int firstVisibleItemPosition) {
-                Log.d("INFINITE scroll", "firstTime: "+firstTime+"\npage: "+currentPage +" > "+Math.ceil((float) mAdapter.getItemCount() / (float) MAXITEMSPERREQUEST));
-
                 if (!firstTime && currentPage > Math.ceil((float) mAdapter.getItemCount() / (float) MAXITEMSPERREQUEST)) {
-                    Log.d("INFINITE scroll", "onScrolledToEnd: break");
                     return;
                 }
-                /*
-                    MuverRestClient.addHeader("token", new CurrentUser(RideRecordsActivity.this).getToken());
-                    RequestParams params = new RequestParams();
-                    params.put("page", page);
-                    params.put("per_page", MAXITEMSPERREQUEST);
-                */
                 currentPage++;
                 firstTime = false;
                 loadMovies();

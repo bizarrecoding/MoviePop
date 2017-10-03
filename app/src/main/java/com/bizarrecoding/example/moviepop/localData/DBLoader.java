@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
-import android.util.Log;
 
 /**
  * Created by Herik on 1/10/2017.
@@ -54,7 +53,7 @@ public class DBLoader extends CursorLoader {
                     break;
             }
         }catch (Exception e){
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         return results;
     }

@@ -15,7 +15,6 @@ import com.bizarrecoding.example.moviepop.MovieDetailsActivity;
 import com.bizarrecoding.example.moviepop.R;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{

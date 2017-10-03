@@ -3,7 +3,7 @@ package com.bizarrecoding.example.moviepop;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.databinding.tool.util.L;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -11,12 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.BoringLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -28,17 +24,14 @@ import com.bizarrecoding.example.moviepop.Objects.Movie;
 import com.bizarrecoding.example.moviepop.Objects.Review;
 import com.bizarrecoding.example.moviepop.Objects.Trailer;
 import com.bizarrecoding.example.moviepop.Utils.ApiMovieFetchLoader;
-import com.bizarrecoding.example.moviepop.Utils.GlobalFunctions;
 import com.bizarrecoding.example.moviepop.Utils.Network;
 import com.bizarrecoding.example.moviepop.localData.DBLoader;
 import com.bizarrecoding.example.moviepop.localData.MovieContract;
 import com.squareup.picasso.Picasso;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class MovieDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
 
@@ -59,8 +52,19 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         setContentView(R.layout.activity_movie_details);
         movie = (Movie) getIntent().getSerializableExtra("movie");
         initGUI();
-        fetchData();
+        if(isOnline()){
+            fetchData();
+        }
         change = false;
+    }
+
+
+    private boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(MainActivity.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null &&
+                cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     private void initGUI() {
@@ -144,7 +148,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                 Toast.makeText(this, R.string.add_favorite,Toast.LENGTH_SHORT).show();
             }catch (Exception e){
                 //Log.e("PARSE ERROR",uri.getLastPathSegment()+" not a number");
-                //e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
@@ -220,7 +224,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     public boolean onPrepareOptionsMenu(Menu menu) {
         star = menu.findItem(R.id.favorite);
         isFavorite();
-        Log.d("FAV",""+isFavorite);
         return true;
     }
 
@@ -234,7 +237,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         change = true;
-        Log.d("FAV",""+isFavorite);
         switch (id){
             case R.id.favorite:
                 if(!isFavorite) {
@@ -242,13 +244,11 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     item.setIcon(R.drawable.ic_star);
                     insertFavorite();
                     isFavorite=true;
-                    Log.d("FAV",""+isFavorite);
                 }else{
                     item.setChecked(false);
                     item.setIcon(R.drawable.ic_star_outline);
                     deleteFavorite();
                     isFavorite = false;
-                    Log.d("FAV",""+isFavorite);
                 }
                 break;
         }

@@ -7,8 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bizarrecoding.example.moviepop.MovieDetailsActivity;
-import com.bizarrecoding.example.moviepop.Objects.Movie;
+
 import com.bizarrecoding.example.moviepop.Objects.Review;
 import com.bizarrecoding.example.moviepop.R;
 
@@ -22,6 +21,10 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
 
     private ArrayList<Review> reviews;
     private Context ctx;
+    private int SHORTCOMMENT = 4;
+    private int FULLCOMMENT = 99;
+    private int LINESTHRESHOLD = 10;
+
 
     public ReviewsAdapter(Context ctx, ArrayList<Review> mList){
         this.reviews = mList;
@@ -50,10 +53,10 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
             public void onClick(View v) {
                 TextView tv = (TextView)v;
                 int lines = tv.getMaxLines();
-                if(lines<10){
-                    tv.setMaxLines(99);
+                if(lines<LINESTHRESHOLD){
+                    tv.setMaxLines(FULLCOMMENT);
                 }else {
-                    tv.setMaxLines(4);
+                    tv.setMaxLines(SHORTCOMMENT);
                 }
             }
         });

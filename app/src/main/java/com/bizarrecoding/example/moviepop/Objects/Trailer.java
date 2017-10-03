@@ -1,7 +1,5 @@
 package com.bizarrecoding.example.moviepop.Objects;
 
-import android.util.Log;
-
 /**
  * Created by Herik on 30/9/2017.
  */
@@ -52,12 +50,9 @@ public class Trailer {
     }
 
     public String getUrl(){
-        Log.d("INTENT URL TYPE",type);
         if (site.equals("YouTube")) {
-            Log.d("INTENT URL", "https://www.youtube.com/watch?v=" + key);
             return "https://www.youtube.com/watch?v=" + key;
         }else{
-            Log.d("INTENT URL", "null");
             return "";
         }
     }

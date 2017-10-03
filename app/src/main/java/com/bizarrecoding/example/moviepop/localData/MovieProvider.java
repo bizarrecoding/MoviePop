@@ -7,11 +7,9 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import static com.bizarrecoding.example.moviepop.localData.MovieContract.MovieEntry.TABLE_NAME;
 
@@ -49,6 +47,7 @@ public class MovieProvider extends ContentProvider {
                 String sel = "_id=?";
                 String[] mSelVal = new String[]{id};
                 returnCursor =  db.query(TABLE_NAME,projection,sel,mSelVal,null,null,sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -70,7 +69,6 @@ public class MovieProvider extends ContentProvider {
         Uri returnUri;
         switch (match){
             case MOVIES:
-                Log.d("VALUES",values.toString());
                 long id = db.insert(TABLE_NAME,null,values);
                 if (id>0){
                     returnUri = ContentUris.withAppendedId(MovieContract.MovieEntry.CONTENT_URI, id);
@@ -107,6 +105,7 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
+        //no implementation needed
         return 0;
     }
 

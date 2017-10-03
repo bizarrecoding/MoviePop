@@ -2,7 +2,6 @@ package com.bizarrecoding.example.moviepop.Objects;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.databinding.repacked.kotlin.collections.LongIterator;
 
 import com.bizarrecoding.example.moviepop.localData.MovieContract;
 
