@@ -24,6 +24,7 @@ import com.bizarrecoding.example.moviepop.Objects.Movie;
 import com.bizarrecoding.example.moviepop.Objects.Review;
 import com.bizarrecoding.example.moviepop.Objects.Trailer;
 import com.bizarrecoding.example.moviepop.Utils.ApiMovieFetchLoader;
+import com.bizarrecoding.example.moviepop.Utils.GlobalFunctions;
 import com.bizarrecoding.example.moviepop.Utils.Network;
 import com.bizarrecoding.example.moviepop.localData.DBLoader;
 import com.bizarrecoding.example.moviepop.localData.MovieContract;
@@ -119,6 +120,11 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             overview.setText(movie.getOverview());
         }else{
             overview.setText(R.string.no_overview);
+        }
+
+        if(!isOnline()){
+            GlobalFunctions.showError(true,trailersList,findViewById(R.id.errorTV1));
+            GlobalFunctions.showError(true,reviewsList,findViewById(R.id.errorTV2));
         }
     }
 

@@ -9,6 +9,11 @@ import android.widget.TextView;
 
 public class GlobalFunctions {
 
+    public static void showError(boolean show,View element, View errorTV) {
+        element.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+        errorTV.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+    }
+
     public static void showProgress(boolean show, View progress, View element, View error){
         progress.setVisibility( show ? View.VISIBLE : View.INVISIBLE);
         element.setVisibility( show ? View.INVISIBLE : View.VISIBLE);
