@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             if(savedInstanceState.containsKey("page")){
                 currentPage = savedInstanceState.getInt("page");
             }
+            if(savedInstanceState.containsKey("state")){
+                state = savedInstanceState.getParcelable("state");
+            }
         }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -76,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if(firstTime) {
             outState.putInt("page", currentPage);
         }
+        state = movieListHolder.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable("state",state);
     }
 
     private void initGUI() {
