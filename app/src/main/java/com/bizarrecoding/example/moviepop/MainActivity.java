@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -62,9 +61,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 currentPage = savedInstanceState.getInt("page");
             }
             if (savedInstanceState.containsKey("movies")){
-                Log.d("RESTORE","load from parcel");
                 movies = savedInstanceState.getParcelableArrayList("movies");
-                Log.d("RESTORE","size: "+movies.size());
             }
         }
         setContentView(R.layout.activity_main);
@@ -95,11 +92,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         movieListHolder.setAdapter(mAdapter);
         movieListHolder.addOnScrollListener(createInfiniteScrollListener());
         if(movies.size()>0){
-            Log.d("RESTORE","load skipped");
             return;
         }
 
-        Log.d("RESTORE","load from web");
         if (currentSort == FAVORITES){
             loadFavs();
         }else{

@@ -58,7 +58,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         rAdapter = new ReviewsAdapter(new ArrayList<Review>());
         tAdapter = new TrailersAdapter(this, new ArrayList<Trailer>());
         if (getIntent().hasExtra("movie")){
-            Log.d("MOVIE","from intent");
             movie = getIntent().getParcelableExtra("movie");
         }
         if(savedInstanceState!= null){
@@ -81,7 +80,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
             initGUI();
         }else {
             initGUI();
-            Log.d("RESTORATION","false");
             if(isOnline()){
                 fetchData();
             }
