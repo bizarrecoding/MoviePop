@@ -1,23 +1,22 @@
-package com.bizarrecoding.example.moviepop.Objects;
+package com.bizarrecoding.example.moviepop.objects;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.databinding.repacked.kotlin.collections.LongIterator;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import com.bizarrecoding.example.moviepop.localData.MovieContract;
+import com.bizarrecoding.example.moviepop.localdata.MovieContract;
 
-import java.io.Serializable;
+public class Movie implements Parcelable{
 
-public class Movie implements Serializable {
-
-    private int _id;
-    private int id;
-    private double votesavg;
-    private String title;
-    private String originalTitle;
-    private String releaseDate;
-    private String overview;
-    private String imagePath;
+    public int _id;
+    public int id;
+    public double votesavg;
+    public String title;
+    public String originalTitle;
+    public String releaseDate;
+    public String overview;
+    public String imagePath;
 
     public int get_Id() {
         return _id;
@@ -57,6 +56,7 @@ public class Movie implements Serializable {
 
     public Movie(int id, double votesavg, String title, String originalTitle,
                  String releaseDate,String overview, String imagePath){
+        this._id = -1;
         this.id = id;
         this.votesavg = votesavg;
         this.title = title;
@@ -81,6 +81,16 @@ public class Movie implements Serializable {
         this.releaseDate = c.getString(c.getColumnIndexOrThrow(MovieContract.MovieEntry.COLUMN_RELEASE));
         this.imagePath = c.getString(c.getColumnIndexOrThrow(MovieContract.MovieEntry.COLUMN_IMAGE_PATH));
     }
+    private Movie(Parcel in){
+        _id = in.readInt();
+        id= in.readInt();
+        votesavg = in.readDouble();
+        title = in.readString();
+        originalTitle = in.readString();
+        releaseDate = in.readString();
+        overview = in.readString();
+        imagePath = in.readString();
+    }
 
     public ContentValues getContentValues(){
         ContentValues movie= new ContentValues();
@@ -93,4 +103,31 @@ public class Movie implements Serializable {
         movie.put(MovieContract.MovieEntry.COLUMN_IMAGE_PATH,imagePath);
         return movie;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(_id);
+        dest.writeInt(id);
+        dest.writeDouble(votesavg);
+        dest.writeString(title);
+        dest.writeString(originalTitle);
+        dest.writeString(releaseDate);
+        dest.writeString(overview);
+        dest.writeString(imagePath);
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }

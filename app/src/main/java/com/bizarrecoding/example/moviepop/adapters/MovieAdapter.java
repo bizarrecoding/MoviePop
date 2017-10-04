@@ -1,4 +1,4 @@
-package com.bizarrecoding.example.moviepop.Adapters;
+package com.bizarrecoding.example.moviepop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bizarrecoding.example.moviepop.Objects.Movie;
+import com.bizarrecoding.example.moviepop.objects.Movie;
 import com.bizarrecoding.example.moviepop.MovieDetailsActivity;
 import com.bizarrecoding.example.moviepop.R;
 import com.squareup.picasso.Picasso;
@@ -36,6 +36,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder>{
             this.movies.addAll(mList);
         }
         notifyDataSetChanged();
+    }
+
+    public ArrayList<Movie> getMovies() {
+        ArrayList<Movie> result = new ArrayList<>();
+        result.addAll(movies);
+        return result;
     }
 
     private Context getContext(){

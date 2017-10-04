@@ -8,12 +8,14 @@
     <ImageView
         android:id="@+id/cover"
         android:layout_width="0dp"
-        android:layout_height="250dp"
+        android:layout_height="wrap_content"
         android:layout_margin="0dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:adjustViewBounds="false"
-        android:scaleType="fitCenter"
+        android:cropToPadding="false"
+        android:minHeight="250dp"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -31,6 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
 
+        android:layout_marginLeft="0dp"
         android:background="@color/semitransparent"
         android:gravity="bottom"
         android:padding="8dp"
@@ -38,13 +41,12 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="@+id/cover"
         app:layout_constraintRight_toRightOf="@+id/cover"
         app:layout_constraintTop_toTopOf="@+id/cover"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="@+id/cover" />
+        tools:layout_constraintTop_creator="1" />
 
     <TextView
         android:id="@+id/release"

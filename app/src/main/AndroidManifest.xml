@@ -26,7 +26,7 @@
         <activity android:name=".MovieDetailsActivity"/>
 
         <provider
-            android:name="com.bizarrecoding.example.moviepop.localData.MovieProvider"
+            android:name="com.bizarrecoding.example.moviepop.localdata.MovieProvider"
             android:authorities="com.bizarrecoding.example.moviepop"
             android:exported="false"/>
     </application>

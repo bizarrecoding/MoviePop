@@ -1,10 +1,9 @@
-package com.bizarrecoding.example.moviepop.Utils;
+package com.bizarrecoding.example.moviepop.utils;
 
 import android.net.Uri;
 import android.util.Log;
 
 import com.bizarrecoding.example.moviepop.BuildConfig;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -16,8 +15,6 @@ public class Network {
     private static final String BASE = "http://api.themoviedb.org/3/movie/";
     private static final String TOPRATED = "top_rated";
     private static final String POPULAR = "popular";
-    private static final String VIDEOS = "videos";
-    private static final String REVIEWS = "reviews";
     private static final String KEY_PARAM = "api_key";
     private static final String PAGE_PARAM = "page";
 
@@ -40,8 +37,8 @@ public class Network {
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
+            Log.e("ERROR",e.getMessage());
         }
-        Log.d("URL",url.toString());
         return url;
     }
 
@@ -55,8 +52,8 @@ public class Network {
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
+            Log.e("ERROR",e.getMessage());
         }
-        Log.d("URL",url.toString());
         return url;
     }
 
