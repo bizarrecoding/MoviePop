@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -13,23 +12,24 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bizarrecoding.example.moviepop.Adapters.MovieAdapter;
-import com.bizarrecoding.example.moviepop.Objects.Movie;
-import com.bizarrecoding.example.moviepop.Utils.ApiMovieFetchLoader;
-import com.bizarrecoding.example.moviepop.Utils.GlobalFunctions;
-import com.bizarrecoding.example.moviepop.Utils.Network;
-import com.bizarrecoding.example.moviepop.localData.DBLoader;
+import com.bizarrecoding.example.moviepop.adapters.MovieAdapter;
+import com.bizarrecoding.example.moviepop.objects.Movie;
+import com.bizarrecoding.example.moviepop.utils.ApiMovieFetchLoader;
+import com.bizarrecoding.example.moviepop.utils.GlobalFunctions;
+import com.bizarrecoding.example.moviepop.utils.Network;
+import com.bizarrecoding.example.moviepop.localdata.DBLoader;
 import com.github.pwittchen.infinitescroll.library.InfiniteScrollListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bizarrecoding.example.moviepop.Adapters.MovieAdapter.MOVIE_REQUEST_CODE;
+import static com.bizarrecoding.example.moviepop.adapters.MovieAdapter.MOVIE_REQUEST_CODE;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks{ //<List<Object>>{
 
@@ -45,20 +45,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private RecyclerView movieListHolder;
     private TextView sortType;
-    private List<Movie> movies;
+    private ArrayList<Movie> movies;
     private MovieAdapter mAdapter;
     private ProgressBar progress;
     private TextView errorTV;
-    private Parcelable state;
     private GridLayoutManager glManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        movies = new ArrayList<>();
         if(savedInstanceState!=null) {
             currentSort = savedInstanceState.getInt("sort");
             if(savedInstanceState.containsKey("page")){
                 currentPage = savedInstanceState.getInt("page");
+            }
+            if (savedInstanceState.containsKey("movies")){
+                Log.d("RESTORE","load from parcel");
+                movies = savedInstanceState.getParcelableArrayList("movies");
+                Log.d("RESTORE","size: "+movies.size());
             }
         }
         setContentView(R.layout.activity_main);
@@ -71,9 +76,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("sort",currentSort);
-        if(firstTime) {
-            outState.putInt("page", currentPage);
-        }
+        outState.putInt("page", currentPage);
+        outState.putParcelableArrayList("movies",mAdapter.getMovies());
     }
 
     private void initGUI() {
@@ -82,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         progress = (ProgressBar) findViewById(R.id.progressBar);
         errorTV = (TextView) findViewById(R.id.errorTV);
         movieListHolder = (RecyclerView) findViewById(R.id.movieList);
-        movies = new ArrayList<>();
 
         glManager = new GridLayoutManager(this, numberOfColumns());
         movieListHolder.setLayoutManager(glManager);
@@ -90,6 +93,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter = new MovieAdapter(this, movies);
         movieListHolder.setAdapter(mAdapter);
         movieListHolder.addOnScrollListener(createInfiniteScrollListener());
+        if(movies.size()>0){
+            Log.d("RESTORE","load skipped");
+            return;
+        }
+
+        Log.d("RESTORE","load from web");
         if (currentSort == FAVORITES){
             loadFavs();
         }else{
@@ -110,9 +119,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(state!=null && movieListHolder != null) {
-            movieListHolder.getLayoutManager().onRestoreInstanceState(state);
-        }
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ){
             glManager.setSpanCount(3);
         }else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {

@@ -1,6 +1,8 @@
-package com.bizarrecoding.example.moviepop.Utils;
+package com.bizarrecoding.example.moviepop.utils;
 
 import android.net.Uri;
+import android.util.Log;
+
 import com.bizarrecoding.example.moviepop.BuildConfig;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +37,7 @@ public class Network {
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
+            Log.e("ERROR",e.getMessage());
         }
         return url;
     }
@@ -49,6 +52,7 @@ public class Network {
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
+            Log.e("ERROR",e.getMessage());
         }
         return url;
     }

@@ -73,6 +73,7 @@
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/extraScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -91,9 +92,7 @@
             android:orientation="vertical">
 
             <include
-                android:id="@+id/scrollView3"
                 layout="@layout/movie_extras_component"
-                layout_width="match_parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"

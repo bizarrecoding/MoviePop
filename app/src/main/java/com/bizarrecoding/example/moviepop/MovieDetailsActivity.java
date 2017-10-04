@@ -11,23 +11,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bizarrecoding.example.moviepop.Adapters.ReviewsAdapter;
-import com.bizarrecoding.example.moviepop.Adapters.TrailersAdapter;
-import com.bizarrecoding.example.moviepop.Objects.Movie;
-import com.bizarrecoding.example.moviepop.Objects.Review;
-import com.bizarrecoding.example.moviepop.Objects.Trailer;
-import com.bizarrecoding.example.moviepop.Utils.ApiMovieFetchLoader;
-import com.bizarrecoding.example.moviepop.Utils.GlobalFunctions;
-import com.bizarrecoding.example.moviepop.Utils.Network;
-import com.bizarrecoding.example.moviepop.localData.DBLoader;
-import com.bizarrecoding.example.moviepop.localData.MovieContract;
+import com.bizarrecoding.example.moviepop.adapters.ReviewsAdapter;
+import com.bizarrecoding.example.moviepop.adapters.TrailersAdapter;
+import com.bizarrecoding.example.moviepop.objects.Movie;
+import com.bizarrecoding.example.moviepop.objects.Review;
+import com.bizarrecoding.example.moviepop.objects.Trailer;
+import com.bizarrecoding.example.moviepop.utils.ApiMovieFetchLoader;
+import com.bizarrecoding.example.moviepop.utils.GlobalFunctions;
+import com.bizarrecoding.example.moviepop.utils.Network;
+import com.bizarrecoding.example.moviepop.localdata.DBLoader;
+import com.bizarrecoding.example.moviepop.localdata.MovieContract;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -46,19 +48,57 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
     private TrailersAdapter tAdapter;
     private boolean change;
     private MenuItem star;
+    private ScrollView mScrollView;
+    private int[] scrollState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
-        movie = (Movie) getIntent().getSerializableExtra("movie");
-        initGUI();
-        if(isOnline()){
-            fetchData();
+        rAdapter = new ReviewsAdapter(new ArrayList<Review>());
+        tAdapter = new TrailersAdapter(this, new ArrayList<Trailer>());
+        if (getIntent().hasExtra("movie")){
+            Log.d("MOVIE","from intent");
+            movie = getIntent().getParcelableExtra("movie");
+        }
+        if(savedInstanceState!= null){
+            if(movie==null) {
+                movie = savedInstanceState.getParcelable("movie");
+            }
+            if(savedInstanceState.containsKey("reviews") && savedInstanceState.containsKey("trailers")){
+                ArrayList<Review> rList = savedInstanceState.getParcelableArrayList("reviews");
+                rAdapter.setReviews(rList);
+                ArrayList<Trailer> tList = savedInstanceState.getParcelableArrayList("trailers");
+                tAdapter.setTrailers(tList);
+            }
+            if(rAdapter.getItemCount()<1){
+                GlobalFunctions.showError(R.string.reviewserror,findViewById(R.id.reviews),findViewById(R.id.noreview));
+            }
+            if(tAdapter.getItemCount()<1){
+                GlobalFunctions.showError(R.string.trailerserror,findViewById(R.id.trailers),findViewById(R.id.notrailer));
+            }
+            scrollState = savedInstanceState.getIntArray("extras_position");
+            initGUI();
+        }else {
+            initGUI();
+            Log.d("RESTORATION","false");
+            if(isOnline()){
+                fetchData();
+            }
         }
         change = false;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("movie",movie);
+        outState.putParcelableArrayList("reviews",rAdapter.getReviews());
+        outState.putParcelableArrayList("trailers",tAdapter.getTrailers());
+        outState.putIntArray("extras_position",
+                new int[]{ mScrollView.getScrollX(), mScrollView.getScrollY()});
+        tAdapter.getTrailers();
+    }
 
     private boolean isOnline() {
         ConnectivityManager cm =
@@ -77,18 +117,15 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         TextView numRate = (TextView) findViewById(R.id.numRate);
         RatingBar ratebar = (RatingBar) findViewById(R.id.ratingBar);
 
+        mScrollView = (ScrollView)findViewById(R.id.extraScroll);
         reviewsList = (RecyclerView)findViewById(R.id.reviews);
         reviewsList.setLayoutManager(new LinearLayoutManager(this));
         reviewsList.setHasFixedSize(true);
-        rAdapter = new ReviewsAdapter(this, new ArrayList<Review>());
         reviewsList.setAdapter(rAdapter);
-
         trailersList = (RecyclerView)findViewById(R.id.trailers);
         trailersList.setLayoutManager(new LinearLayoutManager(this));
         trailersList.setHasFixedSize(true);
-        tAdapter = new TrailersAdapter(this, new ArrayList<Trailer>());
         trailersList.setAdapter(tAdapter);
-
 
         if(movie.getImagePath().length()<40 ){
             String placeholder ="http://via.placeholder.com/100x150";
@@ -123,8 +160,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
         }
 
         if(!isOnline()){
-            GlobalFunctions.showError(true,trailersList,findViewById(R.id.errorTV1));
-            GlobalFunctions.showError(true,reviewsList,findViewById(R.id.errorTV2));
+            GlobalFunctions.showError(trailersList,findViewById(R.id.errorTV1));
+            GlobalFunctions.showError(reviewsList,findViewById(R.id.errorTV2));
+        }
+
+        if(scrollState!=null){
+            mScrollView.scrollTo(scrollState[0],scrollState[1]);
         }
     }
 
@@ -192,6 +233,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements LoaderMan
                     List<Object> list = (List<Object>) data;
                     rAdapter.setReviews((ArrayList<Review>) list.get(0));
                     tAdapter.setTrailers((ArrayList<Trailer>) list.get(1));
+                    if(rAdapter.getItemCount()<1){
+                        GlobalFunctions.showError(R.string.reviewserror,reviewsList,findViewById(R.id.noreview));
+                    }
+                    if(tAdapter.getItemCount()<1){
+                        GlobalFunctions.showError(R.string.trailerserror,trailersList,findViewById(R.id.notrailer));
+                    }
                     break;
                 case IS_FAV_LOADER_ID:
                     Cursor favCursor = (Cursor) data;

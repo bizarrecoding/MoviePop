@@ -1,4 +1,4 @@
-package com.bizarrecoding.example.moviepop.localData;
+package com.bizarrecoding.example.moviepop.localdata;
 
 import android.net.Uri;
 import android.content.ContentResolver;
@@ -16,7 +16,6 @@ public class DBLoader extends CursorLoader {
     private static final int ALL_FAVS = 200;
 
     private final ContentResolver contentResolver;
-    private final Context ctx;
     private int action;
     private int movie_id;
 
@@ -24,7 +23,6 @@ public class DBLoader extends CursorLoader {
 
     public DBLoader(Context context, Bundle args) {
         super(context);
-        this.ctx = context;
         this.contentResolver = context.getContentResolver();
         this.action = args.getInt("Action");
         if(action==IS_FAV){

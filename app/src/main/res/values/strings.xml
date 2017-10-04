@@ -6,6 +6,8 @@
     <string name="no_overview">No overview found.</string>
     <string name="no_release">No release date available</string>
     <string name="networkerror">No internet connection.</string>
+    <string name="reviewserror">No reviews found.</string>
+    <string name="trailerserror">No trailers found.</string>
     <string name="task_error">Error while downloading movies</string>
     <string name="original_title">Original title:</string>
     <string name="release_date">Release date:</string>

@@ -1,4 +1,4 @@
-package com.bizarrecoding.example.moviepop.Adapters;
+package com.bizarrecoding.example.moviepop.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
-import com.bizarrecoding.example.moviepop.Objects.Review;
+import com.bizarrecoding.example.moviepop.objects.Review;
 import com.bizarrecoding.example.moviepop.R;
 
 import java.util.ArrayList;
@@ -20,21 +20,24 @@ import java.util.ArrayList;
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder>{
 
     private ArrayList<Review> reviews;
-    private Context ctx;
     private int SHORTCOMMENT = 4;
     private int FULLCOMMENT = 99;
     private int LINESTHRESHOLD = 10;
 
 
-    public ReviewsAdapter(Context ctx, ArrayList<Review> mList){
+    public ReviewsAdapter(ArrayList<Review> mList){
         this.reviews = mList;
-        this.ctx = ctx;
     }
 
     public void setReviews(ArrayList<Review> mList){
         this.reviews = mList;
         notifyDataSetChanged();
     }
+
+    public ArrayList<Review> getReviews() {
+        return reviews;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final Context cxt = parent.getContext();

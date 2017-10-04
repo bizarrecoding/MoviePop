@@ -1,4 +1,4 @@
-package com.bizarrecoding.example.moviepop.localData;
+package com.bizarrecoding.example.moviepop.localdata;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

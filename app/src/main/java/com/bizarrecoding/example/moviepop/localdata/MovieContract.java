@@ -1,4 +1,4 @@
-package com.bizarrecoding.example.moviepop.localData;
+package com.bizarrecoding.example.moviepop.localdata;
 
 import android.net.Uri;
 import android.provider.BaseColumns;

@@ -1,4 +1,4 @@
-package com.bizarrecoding.example.moviepop.Utils;
+package com.bizarrecoding.example.moviepop.utils;
 
 import android.view.View;
 import android.widget.TextView;
@@ -8,16 +8,21 @@ import android.widget.TextView;
  */
 
 public class GlobalFunctions {
-
-    public static void showError(boolean show,View element, View errorTV) {
-        element.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
-        errorTV.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
-    }
-
     public static void showProgress(boolean show, View progress, View element, View error){
         progress.setVisibility( show ? View.VISIBLE : View.INVISIBLE);
         element.setVisibility( show ? View.INVISIBLE : View.VISIBLE);
         error.setVisibility(View.INVISIBLE);
+    }
+
+    public static void showError(int errorRes, View element, View errorTV) {
+        element.setVisibility(View.INVISIBLE);
+        errorTV.setVisibility(View.VISIBLE);
+        ((TextView)errorTV).setText(errorRes);
+    }
+
+    public static void showError(View element, View errorTV) {
+        element.setVisibility(View.INVISIBLE);
+        errorTV.setVisibility(View.VISIBLE);
     }
 
     public static void showError(int errorRes, View progress, View element, View errorTV) {

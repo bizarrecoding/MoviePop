@@ -1,4 +1,4 @@
-package com.bizarrecoding.example.moviepop.localData;
+package com.bizarrecoding.example.moviepop.localdata;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static com.bizarrecoding.example.moviepop.localData.MovieContract.MovieEntry.TABLE_NAME;
+import static com.bizarrecoding.example.moviepop.localdata.MovieContract.MovieEntry.TABLE_NAME;
 
 /**
  * Created by Herik on 30/9/2017.
